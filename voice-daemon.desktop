@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Voice type daemon
+Comment=Голосовой ввод: держит модель Whisper в памяти, ждёт сигнал по FIFO
+Exec=/home/nimda/bin/voice-type --daemon
+Hidden=false
+X-GNOME-Autostart-enabled=true
