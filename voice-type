@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Указываем скрипту, в каком графическом окружении работать
+export DISPLAY=:0
+export XAUTHORITY=$HOME/.Xauthority
+exec "$HOME/.venv/voice/bin/python" "$HOME/bin/voice-type.py" "$@"
