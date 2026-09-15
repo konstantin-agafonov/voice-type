@@ -17,10 +17,7 @@ import select
 import shutil
 import subprocess
 import sys
-
-import numpy as np
-import sounddevice as sd
-from faster_whisper import WhisperModel
+import time
 
 
 FIFO = "/tmp/voice-type-trigger"
@@ -66,6 +63,7 @@ def clean(text):
 
 
 def rms(block):
+    import numpy as np
     if block.size == 0:
         return 0.0
     return float(np.sqrt(np.mean(block.astype(np.float32) ** 2)))
@@ -74,6 +72,7 @@ def rms(block):
 def trim_silence(audio, threshold, sr=SAMPLE_RATE,
                  window=0.02, pad=0.12):
     """Обрезает тишину на краях записи (окна по 20 мс)."""
+    import numpy as np
     win = max(1, int(sr * window))
     n = len(audio)
     if n < win:
@@ -94,7 +93,6 @@ def press_keys(keys):
 def paste_text(text, paste_keys):
     subprocess.run(["xclip", "-selection", "clipboard"],
                    input=text.encode("utf-8"), check=True)
-    import time
     time.sleep(0.15)
     press_keys(paste_keys)
 
@@ -105,6 +103,8 @@ def paste_text(text, paste_keys):
 def record_until_silence(threshold=0.010, silence_after=1.2,
                          max_seconds=20.0, no_sound_timeout=8.0,
                          start_delay=0.25, debug=False):
+    import numpy as np
+    import sounddevice as sd
     import queue
     q = queue.Queue()
     frames = []
@@ -240,6 +240,7 @@ class Daemon:
         self.model = None
 
     def load_model(self):
+        from faster_whisper import WhisperModel
         t0 = time.time()
         self.log.info("Загрузка модели '%s' (device=%s, compute=%s)...",
                       self.args.model, self.args.device, self.args.compute_type)
@@ -390,8 +391,6 @@ def main():
 
     if not args.daemon:
         # Разовый режим (старое поведение) — удобно для --debug / настройки порога
-        import time
-
         for tool in ("xdotool", "xclip"):
             if shutil.which(tool) is None:
                 print(f"❌ Не найден: {tool}\n   sudo apt install {tool}")
@@ -401,6 +400,7 @@ def main():
             print(f"⏳ Загрузка модели '{args.model}'...")
             print("   (в демон-режиме модель грузится один раз при входе)")
 
+        from faster_whisper import WhisperModel
         model = WhisperModel(args.model, device=args.device,
                              compute_type=args.compute_type)
 
@@ -441,6 +441,9 @@ def main():
         format="%(asctime)s %(levelname)s %(message)s",
         datefmt="%H:%M:%S",
     )
+    # Не засорять лог HTTP-запросами huggingface_hub
+    logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
     log = logging.getLogger("voice-type")
     log.info("=== Демон запущен (pid=%s) ===", os.getpid())
     daemon = Daemon(args, log)

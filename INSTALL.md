@@ -33,12 +33,14 @@ cp voice-daemon.desktop ~/.config/autostart/voice-daemon.desktop
 
 ## 2. Проверка вручную (до автозапуска)
 
-В **одном** терминале запустить демон (первый раз модель `medium` скачается
-из интернета, ~0.5 ГБ, потом кешируется):
+В **одном** терминале запустить демон:
 
 ```bash
 ~/bin/voice-type --daemon
 ```
+
+Первый запуск: модель `medium` (~1.5 ГБ) скачается из интернета (~300–600 сек).
+Повторные: кеш используется, загрузка модели ~7 сек.
 
 В **другом** терминале — триггер:
 
@@ -53,7 +55,7 @@ cp voice-daemon.desktop ~/.config/autostart/voice-daemon.desktop
 Если захотите перезапустить демон после правок:
 
 ```bash
-pkill -f "voice-type.py --daemon"; ~/bin/voice-type --daemon
+pkill -f "[v]oice-type.py --daemon"; ~/bin/voice-type --daemon
 ```
 
 ---
@@ -82,7 +84,8 @@ gsettings get org.cinnamon.desktop.keybindings.custom-keybindings.custom1 comman
 ## 4. Автозапуск демона при входе
 
 Файл `~/.config/autostart/voice-daemon.desktop` уже скопирован (п. 1).
-Он запускает `~/bin/voice-type --daemon` поверхностно при входе.
+Он запускает `~/bin/voice-type --daemon --paste-keys ctrl+shift+v`
+(обновите в файле, если `--paste-keys` пока отсутствует).
 Проверить после перезахода в систему:
 
 ```bash
@@ -93,15 +96,15 @@ pgrep -af "voice-type.py --daemon"      # должен показать проц
 
 ## 5. Флаг вставки для терминала
 
-Если вставлять нужно не `ctrl+v`, а `ctrl+shift+v` (как было в прежней
-привязке F9) — добавьте флаг в автозапуск. Отредактировать
-`~/.config/autostart/voice-daemon.desktop`, строка `Exec`:
+Для вставки в терминал нужен не `ctrl+v`, а `ctrl+shift+v`.
+В autostart-файле `~/.config/autostart/voice-daemon.desktop` этот флаг
+уже прописан в `Exec`:
 
 ```
 Exec=/home/nimda/bin/voice-type --daemon --paste-keys ctrl+shift+v
 ```
 
-Или передать флаги при ручном запуске: `~/bin/voice-type --daemon --paste-keys ctrl+shift+v`.
+Или передать при ручном запуске: `~/bin/voice-type --daemon --paste-keys ctrl+shift+v`.
 
 ---
 
