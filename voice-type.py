@@ -93,7 +93,7 @@ def press_keys(keys):
 def paste_text(text, paste_keys):
     subprocess.run(["xclip", "-selection", "clipboard"],
                    input=text.encode("utf-8"), check=True)
-    time.sleep(0.15)
+    time.sleep(0.25)
     press_keys(paste_keys)
 
 
@@ -171,6 +171,8 @@ INITIAL_PROMPT_RU = (
     "Сохрани этот документ, запусти программу и вставь текст."
 )
 
+HALLUCINATION_RE = re.compile(r"\[.*?\]|\(.*?\)")
+
 
 def transcribe(model, audio, language, beam_size, vad, log):
     try:
@@ -186,6 +188,7 @@ def transcribe(model, audio, language, beam_size, vad, log):
             vad_parameters=vad_params,
         )
         text = " ".join(s.text.strip() for s in segments).strip()
+        text = HALLUCINATION_RE.sub("", text).strip()
         if log:
             log.info("Результат (%.1f сек аудио): %r",
                      float(len(audio)) / SAMPLE_RATE, text)
@@ -377,8 +380,8 @@ def build_parser():
     p.add_argument("--max", dest="max_seconds", type=float, default=20.0)
     p.add_argument("--no-sound-timeout", type=float, default=8.0)
     p.add_argument("--start-delay", type=float, default=0.25)
-    p.add_argument("--paste-keys", default="ctrl+v",
-                   help="Клавиши вставки (для терминала: ctrl+shift+v)")
+    p.add_argument("--paste-keys", default="ctrl+shift+v",
+                   help="Клавиши вставки (по умолчанию: ctrl+shift+v)")
     p.add_argument("--debug", action="store_true")
     return p
 
