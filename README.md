@@ -28,6 +28,7 @@
 | `voice-type.py` | Основной скрипт (демон, триггер, разовый режим) |
 | `voice-type` | Bash-обёртка: задаёт `DISPLAY`/`XAUTHORITY` и запускает Python из виртуального окружения |
 | `voice-daemon.desktop` | Файл автозапуска демона для `~/.config/autostart/` |
+| `Makefile` | Установка (`make install`) и удаление (`make uninstall`) |
 | `INSTALL.md` | Подробная инструкция по установке и настройке |
 
 ## Зависимости
@@ -44,18 +45,26 @@ pip install faster-whisper sounddevice numpy
 
 ## Установка
 
-Кратко (подробности — в [INSTALL.md](INSTALL.md)):
+Системные зависимости:
 
 ```bash
-cp voice-type.py ~/bin/voice-type.py
-cp voice-type ~/bin/voice-type
-chmod +x ~/bin/voice-type
-
-mkdir -p ~/.config/autostart
-cp voice-daemon.desktop ~/.config/autostart/voice-daemon.desktop
+sudo apt install xdotool xclip
+pip install faster-whisper sounddevice numpy
 ```
 
-При первом запуске модель `medium` (~1,5 ГБ) скачивается из интернета; повторные запуски используют кеш.
+Установка файлов и автозапуска:
+
+```bash
+make install
+```
+
+Команда создаст `~/bin` и `~/.config/autostart` (при необходимости), скопирует туда `voice-type.py`, обёртку `voice-type` и `voice-daemon.desktop`, подставив в `.desktop` реальный `$HOME` вместо жёстко прописанного пути. Удаление:
+
+```bash
+make uninstall
+```
+
+При первом запуске модель `medium` (~1,5 ГБ) скачивается из интернета; повторные запуски используют кеш. Подробности и ручная установка — в [INSTALL.md](INSTALL.md).
 
 ## Использование
 
