@@ -28,40 +28,36 @@
 | `voice-type.py` | Основной скрипт (демон, триггер, разовый режим) |
 | `voice-type` | Bash-обёртка: задаёт `DISPLAY`/`XAUTHORITY` и запускает Python из виртуального окружения |
 | `voice-daemon.desktop` | Файл автозапуска демона для `~/.config/autostart/` |
-| `Makefile` | Установка (`make install`) и удаление (`make uninstall`) |
+| `Makefile` | Установка (`make install`), окружение (`make venv`), проверка (`make check`), удаление (`make uninstall`) |
+| `requirements.txt` | Python-зависимости для окружения `~/.venv/voice` |
 | `INSTALL.md` | Подробная инструкция по установке и настройке |
 
 ## Зависимости
 
-- Python 3
-- Пакеты Python: `faster-whisper`, `sounddevice`, `numpy`
-- Системные утилиты: `xdotool`, `xclip`
-- Графическое окружение X11 (Wayland не поддерживается: используются `xdotool` и `xclip`)
+Системные пакеты (графическое окружение X11 — `xdotool` и `xclip`, Wayland не используется):
 
 ```bash
 sudo apt install xdotool xclip
-pip install faster-whisper sounddevice numpy
 ```
+
+Python-пакеты (`faster-whisper`, `sounddevice`, `numpy`) устанавливаются автоматически командой `make install` в отдельное окружение `~/.venv/voice` из `requirements.txt` — вручную ставить их не нужно.
 
 ## Установка
-
-Системные зависимости:
-
-```bash
-sudo apt install xdotool xclip
-pip install faster-whisper sounddevice numpy
-```
-
-Установка файлов и автозапуска:
 
 ```bash
 make install
 ```
 
-Команда создаст `~/bin` и `~/.config/autostart` (при необходимости), скопирует туда `voice-type.py`, обёртку `voice-type` и `voice-daemon.desktop`, подставив в `.desktop` реальный `$HOME` вместо жёстко прописанного пути. Удаление:
+Команда создаёт виртуальное окружение `~/.venv/voice` и устанавливает Python-зависимости, затем создаёт `~/bin` и `~/.config/autostart` (при необходимости), копирует туда `voice-type.py`, обёртку `voice-type` и `voice-daemon.desktop`, подставив в `.desktop` реальный `$HOME` вместо жёстко прописанного пути. Удаление:
 
 ```bash
 make uninstall
+```
+
+Проверить наличие системных зависимостей:
+
+```bash
+make check
 ```
 
 При первом запуске модель `medium` (~1,5 ГБ) скачивается из интернета; повторные запуски используют кеш. Подробности и ручная установка — в [INSTALL.md](INSTALL.md).

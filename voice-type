@@ -3,4 +3,10 @@
 export DISPLAY=:0
 export XAUTHORITY=$HOME/.Xauthority
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-exec "$HOME/.venv/voice/bin/python" "$DIR/voice-type.py" "$@"
+PY="$HOME/.venv/voice/bin/python"
+if [ ! -x "$PY" ]; then
+    echo "Ошибка: не найден интерпретатор виртуального окружения: $PY" >&2
+    echo "Создайте окружение из каталога репозитория: make venv" >&2
+    exit 1
+fi
+exec "$PY" "$DIR/voice-type.py" "$@"
