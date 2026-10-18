@@ -136,6 +136,16 @@ cat /tmp/voice-type.pid              # PID демона
 - **FIFO «зависает»** — удалить канал и перезапустить демон: `rm /tmp/voice-type-trigger`.
 - **Срезаются начало фразы или слова** — подобрать порог: `~/bin/voice-type --debug`, затем увеличить `--threshold` (обычно в диапазоне 0.005–0.020).
 - **Текст не вставляется в терминал** — терминалу нужен `ctrl+shift+v` (передаётся через `--paste-keys`).
+- **`make install` падает с `~/.venv/voice/bin/pip: Нет такого файла или каталога` (Ошибка 127)** — в `~/.venv/voice` осталось неполноценное окружение: `python` в нём есть, а `pip` отсутствует, из-за чего Makefile пропускает пересоздание. Исправление:
+  ```bash
+  rm -rf ~/.venv/voice && make install
+  ```
+  Если пересоздание окружения снова упадёт — доустановить `python3-venv` нужной версии и повторить `make install`:
+  ```bash
+  sudo apt install python3-venv python3$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')-venv
+  make install
+  ```
+  Проверить результат: `~/.venv/voice/bin/pip --version`.
 
 ## Лицензия
 
