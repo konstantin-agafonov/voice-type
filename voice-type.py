@@ -308,6 +308,12 @@ class Daemon:
         if self.pid_running():
             self.log.error("Демон уже запущен (см. %s)", PID_FILE)
             return 1
+        missing = [tool for tool in ("xdotool", "xclip")
+                   if shutil.which(tool) is None]
+        if missing:
+            self.log.warning("⚠️ Не найдены инструменты: %s — вставка/команды "
+                             "не будут работать (sudo apt install %s)",
+                             ", ".join(missing), " ".join(missing))
         self.write_pid()
         try:
             self.load_model()
@@ -326,7 +332,12 @@ class Daemon:
                     fd = os.open(FIFO, os.O_RDWR)
                     continue
                 self._drain(fd)
-                self.handle_trigger()
+                try:
+                    self.handle_trigger()
+                except Exception:
+                    # Сбой вставки/команд не должен убивать демон:
+                    # логируем и ждём следующий триггер
+                    self.log.exception("Сбой обработки триггера (демон продолжает работать)")
         except KeyboardInterrupt:
             self.log.info("🛑 Демон остановлен.")
             return 0
