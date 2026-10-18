@@ -26,11 +26,11 @@ install: venv
 	@echo "ручной запуск: $(BIN_DIR)/$(PROGRAM) --daemon"
 
 venv:
-	@test -x $(VENV)/bin/python || { \
+	@test -x $(VENV)/bin/python && test -x $(VENV)/bin/pip || { \
 		rm -rf $(VENV); \
 		python3 -m venv $(VENV) \
 			|| { echo "Не удалось создать окружение. Установите python3-venv:"; \
-			     echo "  sudo apt install python3$$($(PY3) -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')-venv"; \
+			     echo "  sudo apt install python$$($(PY3) -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')-venv"; \
 			     exit 1; }; \
 	}
 	$(VENV)/bin/pip install --quiet --upgrade pip
